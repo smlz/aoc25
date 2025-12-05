@@ -46,5 +46,6 @@ while changes:
 print("part 2:", nbr)
 print("runs:", runs)
 
+# print final map
 for line in data:
     print("".join(line))
