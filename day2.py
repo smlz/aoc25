@@ -10,6 +10,7 @@ for r in ranges.split(","):
            
 print("part 1:", res)
 
+# Zen of Python: readability counts
 print("part 1:",
       sum(x for r in ranges.split(",") if len(s := r.split("-")) == 2
             for x in range(int(s[0]), int(s[1]) + 1) if (s := str(x))[:len(s)//2] == s[len(s)//2:]
@@ -28,10 +29,11 @@ for r in ranges.split(","):
        
 print("part 2:", res)
 
+# even more zen
 print("part 2:",
       sum(x for r in ranges.split(",") if len(s := r.split("-")) == 2
             for x in range(int(s[0]), int(s[1]) + 1)
-                if any(y[:i] * (len(y) // i) == y for i in range(1, len(str(x)) // 2 + 1) if len(y := str(x)) % n == 0)
+                if any(y[:i] * (len(y) // i) == y for i in range(1, len(str(x)) // 2 + 1) if len(y := str(x)) % i == 0)
          )
      )
        
