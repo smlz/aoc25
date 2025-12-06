@@ -61,3 +61,11 @@ cols = ("".join(chars).strip() for chars in zip(*data_raw[:-1]))
 number_groups = (map(int, numbers.split("&")) for numbers in "&".join(cols).split("&&"))
 ops = (sum if op == "+" else prod for op in data_raw[-1].split())
 print("part 2:", sum(op(numbers) for op, numbers in zip(ops, number_groups)))
+
+# as a single expression (aka readability still counts)
+print("part 2:",
+      sum(op(numbers) for op, numbers in zip(
+          (sum if op == "+" else prod for op in data_raw[-1].split()),
+          (map(int, numbers.split("&")) for numbers in "&".join("".join(chars).strip() for chars in zip(*data_raw[:-1])).split("&&"))
+)))
+
