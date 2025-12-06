@@ -3,6 +3,8 @@ data_raw = (pathlib.Path(__file__).parent / "day6.txt").read_text().strip().spli
 
 from math import prod
 
+## Part 1
+
 lines = (line.split() for line in data_raw)
 res = 0
 for *numbers, op in zip(*lines):
@@ -18,8 +20,9 @@ lines = (line.split() for line in data_raw)
 print("part 1:",
       sum(sum(map(int, numbers)) if op == "+" else prod(map(int, numbers)) for *numbers, op in zip(*lines)))
 
-ops = data_raw[-1].split()
+## Part 2
 
+ops = data_raw[-1].split()
 res = 0
 intermediate = 1 if ops[0] == "*" else 0
 col = 0
@@ -39,3 +42,22 @@ if intermediate:
     res += intermediate
     
 print("part 2:", res)
+
+
+from functools import reduce
+
+# invert row<->cols
+cols = ("".join(chars).strip() for chars in zip(*data_raw[:-1]))
+# group numbers with empty columns as delimiters
+number_groups = reduce(lambda grps, nbr: grps[:-1] + [grps[-1] + [int(nbr)]] if nbr else grps + [[]],
+                       cols, [[]])
+ops = (sum if op == "+" else prod for op in data_raw[-1].split())
+print("part 2:", sum(op(numbers) for op, numbers in zip(ops, number_groups)))
+
+# without reduce
+# invert row<->cols
+cols = ("".join(chars).strip() for chars in zip(*data_raw[:-1]))
+# group numbers with explicit delimiter trick
+number_groups = (map(int, numbers.split("&")) for numbers in "&".join(cols).split("&&"))
+ops = (sum if op == "+" else prod for op in data_raw[-1].split())
+print("part 2:", sum(op(numbers) for op, numbers in zip(ops, number_groups)))
