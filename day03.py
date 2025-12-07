@@ -1,5 +1,5 @@
 import pathlib
-lines = (pathlib.Path(__file__).parent / "day3.txt").read_text().strip().split("\n")
+lines = (pathlib.Path(__file__).parent / "day03.txt").read_text().strip().split("\n")
 
 res = 0
 for line in lines:

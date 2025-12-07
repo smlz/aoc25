@@ -1,5 +1,5 @@
 import pathlib
-data_raw = (pathlib.Path(__file__).parent / "day6.txt").read_text().strip().split("\n")
+data_raw = (pathlib.Path(__file__).parent / "day06.txt").read_text().strip().split("\n")
 
 from math import prod
 

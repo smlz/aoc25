@@ -1,5 +1,5 @@
 import pathlib
-codes = (pathlib.Path(__file__).parent / "day1.txt").read_text().strip().split("\n")
+codes = (pathlib.Path(__file__).parent / "day01.txt").read_text().strip().split("\n")
 
 x = 50
 n1 = 0

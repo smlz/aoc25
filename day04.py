@@ -1,5 +1,5 @@
 import pathlib
-data_raw = (pathlib.Path(__file__).parent / "day4.txt").read_text().strip().split("\n")
+data_raw = (pathlib.Path(__file__).parent / "day04.txt").read_text().strip().split("\n")
 
 # add margin of empty fields around playing field in order to prevent edge cases. like literally.
 line_length = len(data_raw[0]) + 2
