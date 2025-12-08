@@ -32,3 +32,27 @@ for b1, b2 in pairs_by_distance[:n]:
         del circuits[i2]
 
 print("part 1:", prod(sorted(map(len, circuits), reverse=True)[:3]))
+
+
+##########
+# PART 2 #
+##########
+
+# continue from where we stopped in part 1
+for b1, b2 in sorted_by_distance[n:]:
+    i1 = -1
+    i2 = -1
+    for i, c in enumerate(circuits):
+        if b1 in c:
+            i1 = i
+        if b2 in c:
+            i2 = i
+
+    if i1 != i2:    # not yet in the same circuit, thus merge circuits
+        circuits[i1] |= circuits[i2]
+        del circuits[i2]
+
+    if len(circuits) == 1:
+        break
+
+print("part 2:", b1[0] * b2[0])
