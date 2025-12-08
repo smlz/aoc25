@@ -20,9 +20,12 @@ for b1, b2 in pairs_by_distance[:n]:
     i2 = -1
     for i, c in enumerate(circuits):  # locate circuits for boxes
         if b1 in c:
+            assert i1 == -1           # must not find the same box twice
             i1 = i
         if b2 in c:
+            assert i2 == -1
             i2 = i
+    assert i1 != -1 and i2!= -1       # must find both boxes
 
     if i1 != i2:    # not yet in the same circuit, thus merge circuits
         circuits[i1] |= circuits[i2]
