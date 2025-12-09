@@ -14,6 +14,16 @@ print("part 1:", max(size(p1, p2) for p1, p2 in combinations(points, 2)))
 ##########
 # PART 2 #
 ##########
+debug = False
+if debug:
+    data_raw = """7,3
+7,1
+11,1
+11,7
+9,7
+9,5
+2,5
+2,3""".split()
 
 from collections import namedtuple
 from itertools import pairwise, islice
@@ -24,6 +34,25 @@ lines = [(p1, p2) for p1, p2 in pairwise(points)]
 lines.append((points[-1], points[0]))
 vlines = list(islice(lines, 0, None, 2))
 hlines = list(islice(lines, 1, None, 2))
+
+# Check for line intersections and/or contact points
+cnt = 0
+touches = 0
+for hline in hlines:
+    for vline in vlines:
+        assert hline[0].y == hline[1].y
+        assert vline[0].x == vline[1].x
+        min_x = min(p.x for p in hline)
+        max_x = max(p.x for p in hline)
+        min_y = min(p.y for p in vline)
+        max_y = max(p.y for p in vline)
+        assert not (min_x < vline[0].x < max_x and min_y < hline[0].y < max_y)
+        if min_x <= vline[0].x <= max_x and min_y <= hline[0].y <= max_y:
+            touches += 1
+        cnt += 1
+if debug:
+    print("checks:", cnt)
+assert touches == len(lines)
 
 def rect_contains_no_lines(p1, p2):
     min_x = min(p.x for p in (p1, p2))
