@@ -24,13 +24,15 @@ lines.append((points[-1], points[0]))
 vlines = list(islice(lines, 0, None, 2))
 hlines = list(islice(lines, 1, None, 2))
 
-# Check for line intersections and/or contact points
+# Be sure, we understand the file format and problem formulation correctly.
+# The shape should be (a) simply connected (space) with no cut-points.
+# Check for line intersections and/or extra contact points.
 touches = 0
 for hline in hlines:
     h0, h1 = hline
+    assert h0.y == h1.y
     for vline in vlines:
         v0, v1 = vline
-        assert h0.y == h1.y
         assert v0.x == v1.x
         min_x, max_x = min(h0.x, h1.x), max(h0.x, h1.x)
         min_y, max_y = min(v0.y, v1.y), max(v0.y, v1.y)
@@ -38,6 +40,7 @@ for hline in hlines:
         assert not (min_x < v0.x < max_x and min_y < h0.y < max_y)
         if min_x <= v0.x <= max_x and min_y <= h0.y <= max_y:
             touches += 1
+# lines touch only at corners, nowhere else
 assert touches == len(lines)
 
 def rect_contains_no_lines(p1, p2):
