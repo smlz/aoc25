@@ -14,17 +14,6 @@ print("part 1:", max(size(p1, p2) for p1, p2 in combinations(points, 2)))
 ##########
 # PART 2 #
 ##########
-debug = False
-if debug:
-    data_raw = """7,3
-7,1
-11,1
-11,7
-9,7
-9,5
-2,5
-2,3""".split()
-
 from collections import namedtuple
 from itertools import pairwise, islice
 
