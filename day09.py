@@ -36,7 +36,6 @@ vlines = list(islice(lines, 0, None, 2))
 hlines = list(islice(lines, 1, None, 2))
 
 # Check for line intersections and/or contact points
-cnt = 0
 touches = 0
 for hline in hlines:
     for vline in vlines:
@@ -46,19 +45,15 @@ for hline in hlines:
         max_x = max(p.x for p in hline)
         min_y = min(p.y for p in vline)
         max_y = max(p.y for p in vline)
+        # lines shall not intersect
         assert not (min_x < vline[0].x < max_x and min_y < hline[0].y < max_y)
         if min_x <= vline[0].x <= max_x and min_y <= hline[0].y <= max_y:
             touches += 1
-        cnt += 1
-if debug:
-    print("checks:", cnt)
 assert touches == len(lines)
 
 def rect_contains_no_lines(p1, p2):
-    min_x = min(p.x for p in (p1, p2))
-    max_x = max(p.x for p in (p1, p2))
-    min_y = min(p.y for p in (p1, p2))
-    max_y = max(p.y for p in (p1, p2))
+    min_x, max_x = min(p1.x, p2.x), max(p1.x, p2.x)
+    min_y, max_y = min(p1.y, p2.y), max(p1.y, p2.y)
     for vline in vlines:
         # horizontally inside the rectangle and vertically not outside of the rectangle
         if min_x < vline[0].x < max_x and not ((vline[0].y >= max_y and vline[1].y >= max_y) or (vline[0].y <= min_y and vline[1].y <= min_y)):
