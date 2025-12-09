@@ -38,16 +38,16 @@ hlines = list(islice(lines, 1, None, 2))
 # Check for line intersections and/or contact points
 touches = 0
 for hline in hlines:
+    h0, h1 = hline
     for vline in vlines:
-        assert hline[0].y == hline[1].y
-        assert vline[0].x == vline[1].x
-        min_x = min(p.x for p in hline)
-        max_x = max(p.x for p in hline)
-        min_y = min(p.y for p in vline)
-        max_y = max(p.y for p in vline)
+        v0, v1 = vline
+        assert h0.y == h1.y
+        assert v0.x == v1.x
+        min_x, max_x = min(h0.x, h1.x), max(h0.x, h1.x)
+        min_y, max_y = min(v0.y, v1.y), max(v0.y, v1.y)
         # lines shall not intersect
-        assert not (min_x < vline[0].x < max_x and min_y < hline[0].y < max_y)
-        if min_x <= vline[0].x <= max_x and min_y <= hline[0].y <= max_y:
+        assert not (min_x < v0.x < max_x and min_y < h0.y < max_y)
+        if min_x <= v0.x <= max_x and min_y <= h0.y <= max_y:
             touches += 1
 assert touches == len(lines)
 
@@ -55,12 +55,14 @@ def rect_contains_no_lines(p1, p2):
     min_x, max_x = min(p1.x, p2.x), max(p1.x, p2.x)
     min_y, max_y = min(p1.y, p2.y), max(p1.y, p2.y)
     for vline in vlines:
-        # horizontally inside the rectangle and vertically not outside of the rectangle
-        if min_x < vline[0].x < max_x and not ((vline[0].y >= max_y and vline[1].y >= max_y) or (vline[0].y <= min_y and vline[1].y <= min_y)):
+        v0, v1 = vline
+        # horizontally inside the rectangle and vertically not outside the rectangle
+        if min_x < v0.x < max_x and not ((v0.y >= max_y and v0.y >= max_y) or (v0.y <= min_y and v0.y <= min_y)):
             return False
     for hline in hlines:
-        # vertically inside the rectangle and horizontally not outside of the rectangle
-        if min_y < hline[0].y < max_y and not((hline[0].x >= max_x and hline[1].x >= max_x) or (hline[0].x <= min_x and hline[1].x <= min_x)):
+        h0, h1 = hline
+        # vertically inside the rectangle and horizontally not outside the rectangle
+        if min_y < h0.y < max_y and not((h0.x >= max_x and h1.x >= max_x) or (h0.x <= min_x and h1.x <= min_x)):
             return False
     return True
 
