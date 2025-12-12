@@ -113,7 +113,8 @@ def check_free_vars_comb(matrix, free_vars=(), vals=(), current_min=float("inf")
 
     return sum(vals.values())
 
-def process_line_part_2(lineno, line):
+
+def process_line_part_2(line):
     lights, toggles, joltages = re.match(r"\[([\.#]+)\] ([ \d\(\),]+) \{([\d,]+)\}", line).groups()
     toggles = tuple(tuple(int(n) for n in w[1:-1].split(',')) for w in toggles.split())
     joltages = tuple(int(n) for n in joltages.split(","))
@@ -138,7 +139,6 @@ def process_line_part_2(lineno, line):
         if s < current_min:
             current_min = s
 
-    print(f"{lineno: 4d}: {current_min: 4d}")
     return current_min
             
 
@@ -151,13 +151,13 @@ if __name__ == '__main__':
 [...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}
 [.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}""".strip().split("\n")
 
-    print("part 1:", sum(process_line_part_1(line) for line in data_raw))
+    print("part 1:", sum(map(process_line_part_1, data_raw)))
     
     if not debug:
         import multiprocessing
-        # use all cores: execution time around 45 seconds
+        # use all cores: execution time around 4 seconds
         with multiprocessing.Pool() as p:
-            res = p.starmap(process_line_part_2, enumerate(data_raw, 1), chunksize=4)
-        print("part 2:", sum(res))
+            print("part 2:", sum(p.map(process_line_part_2, data_raw)))
     else:
-        print("part 2:", sum(process_line_part_2(i, line) for i, line in enumerate(data_raw, 1)))
+        # around 10 seconds sequentially
+        print("part 2:", sum(map(process_line_part_2, data_raw)))
