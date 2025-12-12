@@ -161,6 +161,9 @@ def process_line_part_2(line):
 
 debug = False
 if __name__ == '__main__':
+    import time
+    start = time.perf_counter()
+
     data_raw = (pathlib.Path(__file__).parent / "day10.txt").read_text().strip().split("\n")
     if debug:
         data_raw = """
@@ -172,9 +175,10 @@ if __name__ == '__main__':
     
     if not debug:
         import multiprocessing
-        # use all cores: execution time around 4 seconds
+        # use all cores: execution time around 3 seconds
         with multiprocessing.Pool() as p:
             print("part 2:", sum(p.map(process_line_part_2, data_raw)))
     else:
-        # around 10 seconds sequentially
+        # around 7 seconds sequentially
         print("part 2:", sum(map(process_line_part_2, data_raw)))
+    print("time:", time.perf_counter() - start)
