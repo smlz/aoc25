@@ -132,9 +132,8 @@ def process_line_part_2(lineno, line):
     free_vars = gauss(matrix)
 
     # now lets brute force through all plausible values for the remaining free variables
-    # (this could probably be optimized)
     current_min = float("inf")
-    for vals in product(*(range(0, max(joltages)) for i in free_vars)):
+    for vals in product(*(range(0, min(joltages[j] for j in toggles[i])) for i in free_vars)):
         s = check_free_vars_comb(matrix, free_vars, vals, current_min)
         if s < current_min:
             current_min = s
