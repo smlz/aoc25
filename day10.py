@@ -1,5 +1,6 @@
 from collections import Counter
-from itertools import combinations, chain
+from fractions import Fraction
+from itertools import combinations, chain, product
 import pathlib
 import re
 
@@ -20,6 +21,126 @@ def process_line_part_1(line):
     lights = [c == '#' for c in lights]
     toggles = tuple(tuple(int(n) for n in w[1:-1].split(',')) for w in toggles.split())
     return test_light_indicators(lights, toggles)
+
+##########
+# PART 2 #
+##########
+
+def print_matrix(matrix):
+    for row in matrix:
+        print(" |", end="")
+        for col in row:
+            print(f"{col}", end=" ")
+        print("|",)
+
+def gauss(matrix):
+    """Gaussion elimination for augmented matrices
+
+    Also returns the list of the free variables
+    """
+    free_vars = []
+    row_idx, col_idx = 0, 0
+    m, n = len(matrix), len(matrix[0])
+    while row_idx < m and col_idx < n-1:
+        # preferably find a one or another value different from zero in current column
+        pivot_idx, pivot = 0, 0
+        for idx in range(row_idx, m):
+            val = matrix[idx][col_idx]
+            if abs(val) == 1:
+                pivot_idx, pivot = idx, val
+                break
+            elif val != 0:
+                pivot_idx, pivot = idx, val
+        # no pivot found
+        if pivot == 0:
+            free_vars.append(col_idx)
+            col_idx += 1
+        else:
+            # swap rows
+            matrix[pivot_idx], matrix[row_idx] = matrix[row_idx], matrix[pivot_idx]
+            # reduce the rows below the pivot
+            for i in range(row_idx + 1, m):
+                # use integers if possible, fractions if needed
+                if matrix[i][col_idx] % pivot != 0:
+                    f = Fraction(matrix[i][col_idx]) / pivot
+                else:
+                    f = matrix[i][col_idx] // pivot
+                matrix[i][col_idx] = 0
+                for j in range(col_idx + 1, n):
+                    matrix[i][j] = matrix[i][j] - f * matrix[row_idx][j]
+            col_idx += 1
+            row_idx += 1
+
+    # add remaining free variables
+    free_vars.extend(range(col_idx, n - 1))
+    return free_vars
+
+def check_free_vars_comb(matrix, free_vars=(), vals=(), current_min=float("inf")):
+    """Check if the given combination of free variables has a valid positive integer solution
+
+    Returns the sum of all free variable values or float("inf") if no integer solution was found
+    or the computed sum is larger then the provided `current_min`.
+    """
+    m = len(matrix)
+    n = len(matrix[0])
+    vals = dict(zip(free_vars, vals))
+    for i in range(0, len(matrix)):
+        # start from the bottom
+        row = matrix[(-1) - i][:]
+        # apply currently known values
+        for j, v in vals.items():
+            row[j] *= v
+        # find pivot position
+        for pivot_idx in range(0, n - 1):
+            if row[pivot_idx] != 0:
+                break
+        else:
+            # all zero?
+            assert row[-1] == 0
+            continue
+        pivot = row[pivot_idx]
+        # solve the equation
+        s = row[-1] - sum(row[pivot_idx + 1: -1])
+        if s % pivot != 0 or s // pivot < 0:
+            # not a valid positive integer number, let's stop
+            return float("inf")
+        else:
+            vals[pivot_idx] = s // pivot
+
+        if sum(vals.values()) >= current_min:
+            # already no improvement, let's stop
+            return float("inf")
+
+    return sum(vals.values())
+
+def process_line_part_2(lineno, line):
+    lights, toggles, joltages = re.match(r"\[([\.#]+)\] ([ \d\(\),]+) \{([\d,]+)\}", line).groups()
+    toggles = tuple(tuple(int(n) for n in w[1:-1].split(',')) for w in toggles.split())
+    joltages = tuple(int(n) for n in joltages.split(","))
+
+    # build matrix
+    matrix = []
+    for i in range(len(joltages)):
+        row = []
+        for j in range(len(toggles)):
+            row.append(1 if i in toggles[j] else 0)
+        row.append(joltages[i])
+        matrix.append(row)
+
+    if debug: print_matrix(matrix)
+    # use gaussian elemination to reduce matrix to row echelon form and to identify free variables
+    free_vars = gauss(matrix)
+
+    # now lets brute force through all plausible values for the remaining free variables
+    # (this could probably be optimized)
+    current_min = float("inf")
+    for vals in product(*(range(0, max(joltages) + 1) for i in free_vars)):
+        s = check_free_vars_comb(matrix, free_vars, vals, current_min)
+        if s < current_min:
+            current_min = s
+
+    print(f"{lineno: 4d}: {current_min: 4d}")
+    return current_min
             
 
 debug = False
@@ -33,3 +154,11 @@ if __name__ == '__main__':
 
     print("part 1:", sum(process_line_part_1(line) for line in data_raw))
     
+    if not debug:
+        import multiprocessing
+        # use all cores: execution time around 45 seconds
+        with multiprocessing.Pool() as p:
+            res = p.starmap(process_line_part_2, enumerate(data_raw, 1), chunksize=4)
+        print("part 2:", sum(res))
+    else:
+        print("part 2:", sum(process_line_part_2(i, line) for i, line in enumerate(data_raw, 1)))
