@@ -38,7 +38,7 @@ for hline in hlines:
         min_y, max_y = min(v0.y, v1.y), max(v0.y, v1.y)
         # lines shall not intersect
         assert not (min_x < v0.x < max_x and min_y < h0.y < max_y)
-        if min_x <= v0.x <= max_x and min_y <= h0.y <= max_y:
+        if (min_x - 1) <= v0.x <= (max_x + 1) and (min_y - 1) <= h0.y <= (max_y + 1):
             touches += 1
 # lines touch only at corners, nowhere else
 assert touches == len(lines)
