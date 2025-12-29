@@ -69,7 +69,7 @@ print("part 1:", prod(sorted(map(len, circuits), reverse=True)[:3]))
 ##########
 
 # continue from where we stopped in part 1
-for b1, b2 in sorted_by_distance[n:]:
+for b1, b2 in pairs_by_distance[n:]:
     i1 = -1
     i2 = -1
     for i, c in enumerate(circuits):
