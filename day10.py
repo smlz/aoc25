@@ -51,25 +51,29 @@ def gauss(matrix):
     row_idx, col_idx = 0, 0
     m, n = len(matrix), len(matrix[0])
     while row_idx < m and col_idx < n-1:
-        # preferably find a one or another value different from zero in current column
+        # preferably find a one or alternatiely the absolute smallest
+        # non-zero value in the current column
         pivot_idx, pivot = 0, 0
         for idx in range(row_idx, m):
             val = matrix[idx][col_idx]
             if abs(val) == 1:
                 pivot_idx, pivot = idx, val
                 break
-            elif val != 0:
+            elif val != 0 and (pivot == 0 or abs(val) < abs(pivot)):
                 pivot_idx, pivot = idx, val
+
         # no pivot found
         if pivot == 0:
             free_vars.append(col_idx)
             col_idx += 1
         else:
             # swap rows
-            matrix[pivot_idx], matrix[row_idx] = matrix[row_idx], matrix[pivot_idx]
+            if pivot_idx != row_idx:
+                matrix[pivot_idx], matrix[row_idx] = matrix[row_idx], matrix[pivot_idx]
             # reduce the rows below the pivot
             for i in range(row_idx + 1, m):
                 # use integers if possible, fractions if needed
+                # (happens less than 0.4% of times on input data)
                 if matrix[i][col_idx] % pivot != 0:
                     f = Fraction(matrix[i][col_idx]) / pivot
                 else:
@@ -91,13 +95,13 @@ def check_free_vars_comb(matrix, free_vars=(), vals=(), current_min=float("inf")
     """Check if the given combination of free variables has a valid positive integer solution
 
     Returns the sum of all free variable values or float("inf") if no integer solution was found
-    or the computed sum is larger then the provided `current_min`.
+    or the computed sum is equal or larger than the provided `current_min`.
     """
     if debug: print("vals", vals, "free_vars", free_vars)
     m = len(matrix)
     n = len(matrix[0])
     vals = dict(zip(free_vars, vals))
-    for i in range(0, len(matrix)):
+    for i in range(0, m):
         if debug: print("current row:", len(matrix) - i, "known variables:", vals)
         # start from the bottom
         row = matrix[(-1) - i][:]
@@ -130,7 +134,6 @@ def check_free_vars_comb(matrix, free_vars=(), vals=(), current_min=float("inf")
     if debug: print("new good set of values found:", vals, "sum:", sum(vals.values()))
     return sum(vals.values())
 
-
 def process_line_part_2(line):
     lights, toggles, joltages = re.match(r"\[([\.#]+)\] ([ \d\(\),]+) \{([\d,]+)\}", line).groups()
     toggles = tuple(tuple(int(n) for n in w[1:-1].split(',')) for w in toggles.split())
@@ -150,6 +153,8 @@ def process_line_part_2(line):
     free_vars = gauss(matrix)
 
     # now lets brute force through all plausible values for the remaining free variables
+    # (most probably more optimizations are possible for the ranges of values for the
+    # free variables by closer analyzing the reduced matrix.)
     current_min = float("inf")
     for vals in product(*(range(0, min(joltages[j] for j in toggles[i])) for i in free_vars)):
         s = check_free_vars_comb(matrix, free_vars, vals, current_min)
